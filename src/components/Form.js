@@ -19,7 +19,8 @@ import axios from 'axios';
 
 const formSchemaTwo = yup.object().shape({
     userName: yup
-    .string("We know you are not Elons son...")
+    .string()
+    .min(2,"We know you are not Elons son...")
     .required("We atleast need your first name, pal."),
     userEmail: yup
     .string()
@@ -27,6 +28,7 @@ const formSchemaTwo = yup.object().shape({
     .required('Enter your email, guy!'),
     userPass: yup
     .string()
+    .min(6, 'Requires a longer password')
     .required('Enter a password, friend!'),
     terms: yup.bool().oneOf([false], 'Please agree to the T.O.U.')
 });
@@ -49,8 +51,10 @@ function Form () {
         terms: ''
     });
 
+    // state to hold our VALID users
     const [userList,setUserList] = useState([]);
     
+    // yup validation func
     const validate = e =>{
         yup.reach(formSchemaTwo,e.target.name)
         .validate(e.target.value)
@@ -71,7 +75,7 @@ function Form () {
         });
     };
 
-    // handles changes within the 
+    // handles changes within the form
     const handleChange = e =>{
         // get errors otherwise
         e.persist();
@@ -98,6 +102,9 @@ function Form () {
             setUserList(userList.concat(resp.data));
         })
         .catch(err=>console.log(err)); // error handling
+
+        
+
     };
 
 
@@ -126,6 +133,7 @@ function Form () {
                     placeholder="*********" 
                     value={formData.password}
                     onChange={handleChange}/>
+                    {errorState.userPass.length > 0 ? (<p className="error">{errorState.userPass}</p>) : null}
                 </label><br />
                 <label> I have read and agree to the Terms and Conditions: 
                     <input type="checkbox" name='terms' value={formData.terms}
